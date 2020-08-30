@@ -31,6 +31,14 @@ repositories {
 }
 
 dependencies {
+    def lombokVersion = '1.18.12'
+    // lombok
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+
     implementation 'org.springframework.boot:spring-boot-starter-web-services'
     implementation('org.apache.httpcomponents:httpclient:4.5')
     implementation 'org.springframework.boot:spring-boot-starter-batch'
@@ -38,11 +46,18 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
-    annotationProcessor 'org.projectlombok:lombok'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     testImplementation 'org.springframework.batch:spring-batch-test'
+
+    // spring oxm
+    compile group: 'org.springframework', name: 'spring-oxm', version: '5.2.8.RELEASE'
+    // xstream
+    // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
+    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.12'
+
+
 }
 
 test {
