@@ -27,6 +27,7 @@ import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 
 /**
@@ -54,7 +55,7 @@ public class JobConfiguration {
     JdbcPagingItemReader<Customer> reader = new JdbcPagingItemReader<>();
     reader.setDataSource(dataSource);
     reader.setFetchSize(1000);
-    reader.setRowMapper(new CustomerRowMapper());
+    reader.setRowMapper(new BeanPropertyRowMapper<>(Customer.class));
 
     // sort keys
     Map<String, Order> sortkeys = new HashMap<>();
@@ -70,51 +71,53 @@ public class JobConfiguration {
     return reader;
   }
 
+
+
   @Bean
   public FlatFileItemWriter<Customer> jsonItemWriter() throws Exception {
-    String customerOutputPath = File.createTempFile("customerOutput", ".out").getAbsolutePath();
+
+    String customerOutputPath = File.createTempFile("customerOutput", ".out", new File("/Users/bnjjong/temp")).getAbsolutePath();
     log.info(">>>>>>>>>>> Output path : {}", customerOutputPath);
     FlatFileItemWriter<Customer> writer = new FlatFileItemWriter<>();
     writer.setLineAggregator(new CustomLineAggregator());
+    writer.setResource(new FileSystemResource(customerOutputPath));
     writer.afterPropertiesSet();
-
     return writer;
   }
 
+
   @Bean
   public StaxEventItemWriter<Customer> xmlItemWriter() throws Exception {
-    String customerOutputPath = File.createTempFile("customerOutput", ".out").getAbsolutePath();
-    log.info(">>>>>>>>>>> Output path : {}", customerOutputPath);
 
+    String customerOutputPath = File.createTempFile("customerOutput", ".out", new File("/Users/bnjjong/temp")).getAbsolutePath();
+    log.info(">>>>>>>>>>> Output path : {}", customerOutputPath);
     Map<String, Class> aliases = new HashMap<>();
     aliases.put("customer", Customer.class);
     XStreamMarshaller marshaller = new XStreamMarshaller();
     marshaller.setAliases(aliases);
 
-    // Stax and Marchaller for serializing object to XML.
+    // StAX and Marshaller for serializing object to XML.
     StaxEventItemWriter<Customer> writer = new StaxEventItemWriter<>();
     writer.setRootTagName("customers");
     writer.setMarshaller(marshaller);
     writer.setResource(new FileSystemResource(customerOutputPath));
     writer.afterPropertiesSet();
-
     return writer;
   }
 
   @Bean
-  public ClassifierCompositeItemWriter<Customer> classifierCompositeItemWriter() throws Exception {
+  public ClassifierCompositeItemWriter<Customer> classifierCustomerCompositeItemWriter() throws Exception {
     ClassifierCompositeItemWriter<Customer> compositeItemWriter = new ClassifierCompositeItemWriter<>();
     compositeItemWriter.setClassifier(new CustomerClassifier(xmlItemWriter(), jsonItemWriter()));
-
     return compositeItemWriter;
   }
 
   @Bean
-  public Step step1() throws Exception {
-    return stepBuilderFactory.get("step1")
+  public Step sample2Step1() throws Exception {
+    return stepBuilderFactory.get("step1-sample2")
         .<Customer, Customer>chunk(10)
         .reader(customerJdbcPagingItemReader())
-        .writer(classifierCompositeItemWriter())
+        .writer(classifierCustomerCompositeItemWriter())
         .stream(xmlItemWriter())
         .stream(jsonItemWriter())
         .build();
@@ -123,7 +126,7 @@ public class JobConfiguration {
   @Bean
   public Job job() throws Exception {
     return jobBuilderFactory.get("job_sample2")
-        .start(step1())
+        .start(sample2Step1())
         .build();
   }
 

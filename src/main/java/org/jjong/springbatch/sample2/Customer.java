@@ -15,6 +15,10 @@ import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * create on 2020/08/31.
@@ -26,17 +30,25 @@ import lombok.Data;
  * @see
  * @since 지원하는 자바버전 (ex : 5+ 5이상)
  */
-@Data
-@AllArgsConstructor
+@ToString
+@Getter
+@Setter
+@NoArgsConstructor
 @Builder
 @Entity
 public class Customer {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private final Long id;
-  private final String firstName;
-  private final String lastName;
-  private final String birthDate;
+  private Long id;
+  private String firstName;
+  private String lastName;
+  private String birthDate;
 
+  public Customer(Long id, String firstName, String lastName, String birthDate) {
+    this.id = id;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.birthDate = birthDate;
+  }
 }
