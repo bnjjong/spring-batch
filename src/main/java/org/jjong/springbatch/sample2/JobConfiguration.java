@@ -76,7 +76,7 @@ public class JobConfiguration {
   @Bean
   public FlatFileItemWriter<Customer> jsonItemWriter() throws Exception {
 
-    String customerOutputPath = File.createTempFile("customerOutput", ".out", new File("/Users/bnjjong/temp")).getAbsolutePath();
+    String customerOutputPath = File.createTempFile("customerOutput_json", ".out", new File("/Users/bnjjong/temp")).getAbsolutePath();
     log.info(">>>>>>>>>>> Output path : {}", customerOutputPath);
     FlatFileItemWriter<Customer> writer = new FlatFileItemWriter<>();
     writer.setLineAggregator(new CustomLineAggregator());
@@ -89,7 +89,7 @@ public class JobConfiguration {
   @Bean
   public StaxEventItemWriter<Customer> xmlItemWriter() throws Exception {
 
-    String customerOutputPath = File.createTempFile("customerOutput", ".out", new File("/Users/bnjjong/temp")).getAbsolutePath();
+    String customerOutputPath = File.createTempFile("customerOutput_xml", ".out", new File("/Users/bnjjong/temp")).getAbsolutePath();
     log.info(">>>>>>>>>>> Output path : {}", customerOutputPath);
     Map<String, Class> aliases = new HashMap<>();
     aliases.put("customer", Customer.class);
